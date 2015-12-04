@@ -30,8 +30,8 @@ Attributes
 * `proxy_url` - By default al-agent does not require the use of a proxy.  This attribute is useful if you want to avoid a single point of egress.  When a proxy is used, both `egress_url` and `proxy_url` values are required.  If you specify a proxy URL ensure that it is a properly formatted URI.  String defaults to `nil`
 
 #### Installing from GitHub
-# Clone the repo
-# Symlink from al_agents to root of salt
+1. Clone the repo
+2. Symlink from al_agents to root of salt
 
 
 Available states
