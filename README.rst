@@ -29,9 +29,10 @@ Attributes
 * `egress_url` - By default all traffic is sent to vaporator.alertlogic.com:443.  This attribute is useful if you have a machine that is responsible for outbound traffic (NAT box).  If you specify your own URL ensure that it is a properly formatted URI.  String defaults to `vaporator.alertlogic.com:443`
 * `proxy_url` - By default al-agent does not require the use of a proxy.  This attribute is useful if you want to avoid a single point of egress.  When a proxy is used, both `egress_url` and `proxy_url` values are required.  If you specify a proxy URL ensure that it is a properly formatted URI.  String defaults to `nil`
 
-#### Installing from GitHub
-1. Clone the repo
-2. Symlink from al_agents to root of salt
+Installing from GitHub
+================
+1) Clone the repo
+2) Symlink from al_agents to root of salt
 
 
 Available states
