@@ -35,7 +35,11 @@
   {% set initscript = 'rsyslog' %}
   {% set pkg_name_arch = 'amd64' %}
   {% set pkg_name_ext = 'deb' %}
-  {% set syslog_ng_source = 's_src' %}
+  {% if grains['osmajorrelease'] >= 7 %}
+    {% set syslog_ng_source = 's_all' %}
+  {% elif grains['osmajorrelease'] < 7 %}
+    {% set syslog_ng_source = 's_sys' %}
+  {% endif %}
 {% elif (grains['os_family'] == 'RedHat') %}
   {% set pkg_name_prefix = 'al-agent-LATEST-1.' %}
   {% set initscript = 'rsyslog' %}
