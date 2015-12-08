@@ -90,8 +90,9 @@ Configure selinux context on tcp 1514
 
 Sends a test log to ensure everything is working
 
+
 Contributing
-------------
+============
 
 1. Fork the repository on Github
 2. Create a named feature branch (like `add_component_x`)
@@ -101,7 +102,7 @@ Contributing
 6. Submit a Pull Request using Github
 
 License and Authors
--------------------
+===================
 License:
 Distributed under the Apache 2.0 license.
 
