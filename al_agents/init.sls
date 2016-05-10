@@ -1,11 +1,12 @@
-{% from "al_agents/defaults.sls" import pkg_url with context %}
+{% from "al_agents/defaults.sls" import alertlogic_pkg_url with context %}
 
 
 al-agent:
   pkg:
     - installed
     - sources:
-      - al-agent: {{ pkg_url }}
+      - al-agent: {{ alertlogic_pkg_url }}
+  {% if (grains['os'] != 'Windows') %}
   service:
     - running
     - required:
@@ -14,3 +15,4 @@ al-agent:
     - restart: True
     # - watch:
     #   - file: /var/alertlogic/etc/host_key.pem
+  {% endif %}
