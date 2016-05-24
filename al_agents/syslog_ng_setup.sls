@@ -1,4 +1,4 @@
-{% from "al_agents/defaults.sls" import syslog_ng_source with context %}
+{% from "al_agents/defaults.sls" import alertlogic_syslog_ng_source with context %}
 
 include:
   - al_agents
@@ -17,7 +17,7 @@ include:
     - source: salt://al_agents/files/syslog-ng/alertlogic.conf
     - template: jinja
     - defaults:
-       syslog_ng_source: {{ syslog_ng_source }}
+       syslog_ng_source: {{ alertlogic_syslog_ng_source }}
 
     - onlyif:
       - ls /etc/init.d/syslog-ng
@@ -29,3 +29,5 @@ syslog-ng:
     - watch:
       - file: /etc/syslog-ng/conf.d/alertlogic.conf
       - file: /etc/syslog-ng/syslog-ng.conf
+    - onlyif:
+      - ls /etc/init.d/syslog-ng

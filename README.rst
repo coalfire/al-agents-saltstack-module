@@ -12,6 +12,7 @@ Supported OS
 * Debian 7 amd64/i386
 * RedHat 6 x86_64/i386
 * CentOS 6 x86_64/i386
+* Windows
 
 Supported Sysloggers
 ====================
@@ -36,7 +37,9 @@ Installing from GitHub
 ================
 1) Clone the repo
 2) Symlink from al_agents to root of salt
-
+3) If using Windows minions please add https://github.com/alertlogic/salt-winrepo to winrepo_remotes
+3a) run `salt-run winrepo.update_git_repos` on master to download and sync the new repo.
+3b) run `salt -G 'os:windows' pkg.refresh_db` on master to refresh the db on all windows minions
 
 Available states
 ================
