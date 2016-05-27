@@ -1,55 +1,79 @@
-{% from "al_agents/config.sls" import registration_key, egress_url, proxy_url, port, for_autoscaling, for_imaging with context %}
+{% from "al_agents/config.sls" import alertlogic_registration_key, alertlogic_egress_url, alertlogic_proxy_url, alertlogic_port, alertlogic_for_autoscaling, alertlogic_for_imaging with context %}
+
+{% set alertlogic_linux_configure = [] %}
+{% set alertlogic_linux_provision = [] %}
+{% set alertlogic_windows_options = [] %}
 
 # Setting variables for provisioning of the agent
-{% if registration_key != '' or registration_key != 'your_registration_key_here' %}
-  {% set regoptions = ' --key ' ~ registration_key %}
+{% if alertlogic_registration_key != False %}
+  {% do alertlogic_linux_provision.append(' --key ' ~ alertlogic_registration_key) %}
+  {% if (grains['os'] == 'Windows') %}
+    {% if salt.cmd.run('type "C:\Program Files (x86)\Common Files\AlertLogic\host_key.pem"') == True %}
+      {% do alertlogic_windows_options.append('PROV_NOW=0') %}
+      {% do alertlogic_windows_options.append('INSTALL_ONLY=1') %}
+    {% else %}
+      {% do alertlogic_windows_options.append('PROV_KEY=' ~ alertlogic_registration_key) %}
+    {% endif %}
+  {% endif %}
 {% endif %}
-
-{% if for_autoscaling != '' %}
-  {% set typeoptions = '--inst-type role' %}
-{% else %}
-  {% set typeoptions = '--inst-type host' %}
-{% endif %}
-
-{% set provision_options = typeoptions ~ regoptions %}
 
 # Setting variables for configuring the agent
-{% if proxy_url != '' %}
-  {% set proxyoptions = ' --proxy ' ~ proxy_url %}
-{% else %}
-  {% set proxyoptions = '' %}
+{% if alertlogic_proxy_url != False %}
+  {% do alertlogic_linux_configure.append(' --proxy ' ~ alertlogic_proxy_url) %}
+  {% do alertlogic_windows_options.append('USE_PROXY=' ~ alertlogic_proxy_url) %}
 {% endif %}
 
-{% if egress_url != '' %}
-  {% set hostoptions = '--host ' ~ egress_url %}
-{% else %}
-  {% set hostoptions = '' %}
+{% if alertlogic_egress_url != False %}
+  {% do alertlogic_linux_configure.append('--host ' ~ alertlogic_egress_url) %}
+  {% do alertlogic_windows_options.append('SENSOR_HOST=' ~ alertlogic_egress_url) %}
 {% endif %}
 
-{% set configure_options = hostoptions ~ proxyoptions %}
+{% if alertlogic_for_imaging == True %}
+  {% do alertlogic_windows_options.append('PROV_ONLY=host') %}
+  {% do alertlogic_windows_options.append('INSTALL_ONLY=1') %}
+{% endif %}
+
+
+{% set alertlogic_provision_options = alertlogic_linux_provision|join(' ') %}
+{% set alertlogic_configure_options = alertlogic_linux_configure|join(' ') %}
+{% set alertlogic_windows_install_options = alertlogic_windows_options|join(' ') %}
+
+# SENSOR_HOST, SENSOR_PORT, USE_PROXY, PROV_NOW, PROV_KEY, PROV_ONLY, INSTALL_ONLY
 
 # Set up the download url based on system information
-{% set base_url = 'https://scc.alertlogic.net' %}
+{% set alertlogic_base_url = 'https://scc.alertlogic.net' %}
 {% if (grains['os_family'] == 'Debian') %}
-  {% set pkg_name_prefix = 'al-agent_LATEST_' %}
-  {% set initscript = 'rsyslog' %}
-  {% set pkg_name_arch = 'amd64' %}
-  {% set pkg_name_ext = 'deb' %}
+  {% set alertlogic_pkg_name_prefix = 'al-agent_LATEST_' %}
+  {% set alertlogic_initscript = 'rsyslog' %}
+  {% set alertlogic_pkg_name_arch = 'amd64' %}
+  {% set alertlogic_pkg_name_ext = 'deb' %}
   {% if grains['osmajorrelease'] >= 7 %}
-    {% set syslog_ng_source = 's_all' %}
+    {% set alertlogic_syslog_ng_source = 's_all' %}
   {% elif grains['osmajorrelease'] < 7 %}
-    {% set syslog_ng_source = 's_sys' %}
+    {% set alertlogic_syslog_ng_source = 's_sys' %}
   {% endif %}
 {% elif (grains['os_family'] == 'RedHat') %}
-  {% set pkg_name_prefix = 'al-agent-LATEST-1.' %}
-  {% set initscript = 'rsyslog' %}
-  {% set pkg_name_arch = grains['cpuarch'] %}
-  {% set pkg_name_ext = 'rpm' %}
+  {% set alertlogic_pkg_name_prefix = 'al-agent-LATEST-1.' %}
+  {% set alertlogic_initscript = 'rsyslog' %}
+  {% set alertlogic_pkg_name_arch = grains['cpuarch'] %}
+  {% set alertlogic_pkg_name_ext = 'rpm' %}
   {% if grains['osmajorrelease'] >= 6 %}
-    {% set syslog_ng_source = 's_all' %}
+    {% set alertlogic_syslog_ng_source = 's_all' %}
   {% elif grains['osmajorrelease'] < 6 %}
-    {% set syslog_ng_source = 's_sys' %}
+    {% set alertlogic_syslog_ng_source = 's_sys' %}
   {% endif %}
+{% else %}
+  {% set alertlogic_pkg_name_prefix = '' %}
+  {% set alertlogic_pkg_name_arch = '' %}
+  {% set alertlogic_pkg_name_ext = '' %}
 {% endif %}
 
-{% set pkg_url = base_url ~ '/software/' ~ pkg_name_prefix ~ pkg_name_arch ~ '.' ~ pkg_name_ext %}
+{% set alertlogic_linux_pkg_url = alertlogic_base_url ~ '/software/' ~ alertlogic_pkg_name_prefix ~ alertlogic_pkg_name_arch ~ '.' ~ alertlogic_pkg_name_ext %}
+{% set alertlogic_win_pkg_url = alertlogic_base_url ~ '/software/al_agent-LATEST.msi' %}
+
+{% if (grains['os'] == 'Windows') %}
+  {% set alertlogic_pkg_url = alertlogic_win_pkg_url %}
+{% else %}
+  {% set alertlogic_pkg_url = alertlogic_linux_pkg_url %}
+{% endif %}
+
