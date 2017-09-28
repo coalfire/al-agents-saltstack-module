@@ -20,8 +20,8 @@ Supported Sysloggers
 * rsyslog
 * syslog-ng
 
-**Note:** If you are using a syslog other than the above you need to configure it to send logs to tcp 1514
-**Note:** If you are using a deriavite of SaltStack's rsyslog formula and using pillars, add salt://al_agents/files/rsyslog/alertlogic.conf to the custom section
+**Note:** If you are using a syslog other than the above you need to configure it to send logs to tcp 1514.
+**Note:** If you are using a derivative of SaltStack's rsyslog formula and using pillars, add salt://al_agents/files/rsyslog/alertlogic.conf to the custom section.
 
 
 Attributes
